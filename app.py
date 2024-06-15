@@ -31,16 +31,6 @@ data = pd.read_csv('/root/code/NathaliaMontandon/stocks_vs_behavior/data/process
 data['Date'] = pd.to_datetime(data['Date']).dt.date
 data = data.drop(columns=['Unnamed: 0'])
 
-st.markdown(
-    """
-    <style>
-    .sidebar .sidebar-content {
-        font-size: 20px; /* Altere o valor para o tamanho desejado */
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 # Selectbox para selecionar a ação desejada
 value = st.sidebar.selectbox(
     'Selecione o seu ativo',  data.Stock.unique()
@@ -65,7 +55,9 @@ filtered_data = data[data['Stock'] == value]
 # Seleção de dias para predição
 # a = st.sidebar.radio('Selecione o período da predição (em dias):', ['1','3','7'])
 
-# Separação da tela principal em três colunas, a primeira com as cotações históricas, a segunda com o gráfico histórico da ação selecionada e o terceiro com o valor predito
+# Separação da tela principal em três colunas, a primeira com as cotações
+# históricas, a segunda com o gráfico histórico da ação selecionada e o
+# terceiro com o valor predito
 col1, col2, col3= st.columns([1,2,1], gap='medium')
 with col1:
     st.write("## Cotação histórica:")
@@ -74,7 +66,7 @@ with col1:
 
 with col2:
     st.write("## Gráfico histórico")
-    st.line_chart(filtered_data, y=['Close'])
+    st.line_chart(filtered_data, x='Date', y=['Close'])
 
 with col3:
     st.write('## Cotação Prevista')
@@ -82,21 +74,6 @@ with col3:
         ' Stock': [d],
         'Predicted price': [10]
     }))
-
-
-
-# date_options = data['Date'].unique().tolist()
-# date = st.sidebar.slider("Selecione o período:", 2008,2016, (2008,2016))
-# date_options = sorted(data['Date'].unique())
-
-# # Criar um slider no Streamlit para selecionar o período
-# start_year, end_year = st.sidebar.slider(
-#     "Selecione o período:",
-#     min_value=date_options[0],
-#     max_value=date_options[-1],
-#     )
-
-
 
 
 st.write('---')
