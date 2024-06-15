@@ -1,7 +1,8 @@
-
+# Importação de bibliotecas
+import datetime
 import streamlit as st
-import time
 import pandas as pd
+
 
 st.set_page_config('Stock vs. Behavior - Quanto irá valer?',
                    page_icon='/root/code/NathaliaMontandon/stocks_vs_behavior/pages/icone.jpg',
@@ -9,10 +10,12 @@ st.set_page_config('Stock vs. Behavior - Quanto irá valer?',
 
 text = 'Stock vs. Behavior - Quanto irá valer?'
 
+
+# Configurações da página
 st.markdown(f"""
     <style>
     .centered-text {{
-        color: #4b0081;
+        color: #0000ff;
         text-align: center;
         font-size: 40px;
     }}
@@ -23,36 +26,46 @@ st.markdown(f"""
     """, unsafe_allow_html=True)
 
 
-
+# Carregamento e tratamento dos dados
 data = pd.read_csv('/root/code/NathaliaMontandon/stocks_vs_behavior/data/processed/stock_market_dataset.csv')
 data['Date'] = pd.to_datetime(data['Date']).dt.date
 data = data.drop(columns=['Unnamed: 0'])
 
-
-#### Add a selectbox to the sidebar:
-####Item funcionando corretamente
+st.markdown(
+    """
+    <style>
+    .sidebar .sidebar-content {
+        font-size: 20px; /* Altere o valor para o tamanho desejado */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+# Selectbox para selecionar a ação desejada
 value = st.sidebar.selectbox(
     'Selecione o seu ativo',  data.Stock.unique()
     #  ('Amazon', 'Apple', 'Google', 'Microsoft', 'Nvidia')
 )
+
+# date = st.sidebar.date_input("Selecione a data:", min_value=2008, max_value=2016, key=None, help=None, on_change=None, args=None, kwargs=None, *, format="YYYY/MM/DD", disabled=False, label_visibility="visible")
+# d = st.date_input("When's your birthday", datetime.date(2019, 7, 6))
+# st.write("Your birthday is:", d)
+
+# Input da data cuja previsão será realizada
+d = st.sidebar.date_input("Selecione a data (06/09/2008 a 30/07/2016):", value=None, min_value=datetime.date(2008,6,9), max_value=datetime.date(2016,7,30))
+# st.sidebar.write("Your birthday is:", d)
+
+# Retorno dos dados filtrados
 filtered_data = data[data['Stock'] == value]
 
 
-# date_options = data['Date'].unique().tolist()
-# date = st.sidebar.slider("Selecione o período:", 2008,2016, (2008,2016))
-# date_options = sorted(data['Date'].unique())
-
-# Filtrar DataFrame com base na seleção
-
-            #  & (data['Date'] >= date_options[0]) & (data['Date'] <= date_options[1])]
-
-# st.subheader('DataFrame Filtrado')
-
-##### fim
 
 
 
+# Seleção de dias para predição
+# a = st.sidebar.radio('Selecione o período da predição (em dias):', ['1','3','7'])
 
+# Separação da tela principal em três colunas, a primeira com as cotações históricas, a segunda com o gráfico histórico da ação selecionada e o terceiro com o valor predito
 col1, col2, col3= st.columns([1,2,1], gap='medium')
 with col1:
     st.write("## Cotação histórica:")
@@ -61,16 +74,15 @@ with col1:
 
 with col2:
     st.write("## Gráfico histórico")
-
-   # You can call any Streamlit command, including custom components:
     st.line_chart(filtered_data, y=['Close'])
 
 with col3:
     st.write('## Cotação Prevista')
     st.write(pd.DataFrame({
-        ' Stock': ['D+1','D+2','D+3','D+4'],
-        'Close': [10, 20, 30, 40]
+        ' Stock': [d],
+        'Predicted price': [10]
     }))
+
 
 
 # date_options = data['Date'].unique().tolist()
