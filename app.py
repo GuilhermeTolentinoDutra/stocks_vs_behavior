@@ -30,6 +30,7 @@ st.markdown(f"""
 data = pd.read_csv('/root/code/NathaliaMontandon/stocks_vs_behavior/data/processed/stock_market_dataset.csv')
 data['Date'] = pd.to_datetime(data['Date']).dt.date
 data = data.drop(columns=['Unnamed: 0'])
+data = data[['Stock','Date','Close','Volume']]
 
 # Selectbox para selecionar a ação desejada
 value = st.sidebar.selectbox(
