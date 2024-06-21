@@ -1,4 +1,4 @@
-from tensorflow.keras import models
+import tensorflow as tf
 import pickle
 import numpy as np
 import os
@@ -11,7 +11,7 @@ path_models = os.path.join(os.path.abspath(""), "models")
 
 def predict(data, selected_date):
     # Load model
-    model = models.load_model(
+    model = tf.keras.models.load_model(
         os.path.join(
             path_models,
             "aapl_rnn_model.keras",
@@ -25,6 +25,7 @@ def predict(data, selected_date):
     with open(os.path.join(path_models, "aapl_feature_scaler.pkl"), "rb") as f:
         feature_scaler = pickle.load(f)
 
+    # selected_date = selected_date + " 23:59:59"
     data_predict = data[data["Date"] <= selected_date]
     data_predict["AAPL_target"] = target_scaler.transform(data_predict[["AAPL_target"]])
 
