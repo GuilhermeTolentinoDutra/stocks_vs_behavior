@@ -9,3 +9,5 @@ Nossas decisões estão a apenas um clique de distância. Gostos pessoais, hábi
 E no mercado financeiro, seria diferente? Como essa superexposição a diversos tipos de conteúdo pode influenciar o comportamento das ações na bolsa de valores? 
 
 Nosso projeto busca demonstrar como as principais notícias podem impactar o preço das ações, considerando que muitos investidores baseiam suas operações nos acontecimentos do momento.
+
+Projeto elaborado por: Evandro Herrera, Guilherme Dutra, Letícia Mesquita e Nathália Montandon
