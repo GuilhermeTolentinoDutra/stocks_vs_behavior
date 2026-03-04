@@ -20,22 +20,10 @@ subtitle = "Quanto a AAPL irá valer de acordo com as notícias?"
 # Configurações da página  #0000ff
 st.markdown(
     f"""
-        <style>
-        .centered-text {{
-            color: #5f52f2;
-            text-align: center;
-            font-size: 40px;
-            font-weight: bold
-        }}
-        .subtitle-text {{
-            text-align: center;
-            font-size: 20px;
-        }}
-        </style>
-        <div class="centered-text">
+        <div style="color: #5f52f2; text-align: center; font-size: 40px; font-weight: bold;">
             {text}
         </div>
-        <div class="subtitle-text">
+        <div style="text-align: center; font-size: 20px;">
             {subtitle}
         </div>
     """,
@@ -125,9 +113,6 @@ with col2:
             value=f"US$ {dif_price:.2f}",
             delta=f"{dif_delta:.4f} p.p.",
         )
-
-    with col2_dif:
-        st.metric(label="R²", value=f"{0.9997111558914185:.4f}")
 
 st.write("## Gráfico da Cotação Histórica")
 st.line_chart(filtered_data, x="Date", y=["Close"], color="#5f52f2")

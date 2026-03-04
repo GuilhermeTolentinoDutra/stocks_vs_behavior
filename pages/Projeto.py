@@ -1,16 +1,16 @@
 import streamlit as st
+import os
 
 st.set_page_config(page_title='O Projeto',
-                   page_icon='/root/code/NathaliaMontandon/stocks_vs_behavior/pages/icone.jpg',
+                   page_icon=os.path.join(os.path.dirname(__file__), 'icone.jpg'),
                    layout="wide")
 
 st.markdown(
-    """"
+    """
     <h1 style='text-align: center; color: #4b0081;'>
-        Ações vs. Comportamentos
-
-COMPORTAMENTOS INFLUENCIAM
-... o comportamento dos consumidores
+        Ações vs. Comportamentos<br>
+        <small>COMPORTAMENTOS INFLUENCIAM</small><br>
+        <small>... o comportamento dos consumidores</small>
     </h1>
     """,
     unsafe_allow_html=True)
@@ -32,31 +32,25 @@ DADOS:
 Cotação histórica das ações negociadas nas bolsas dos EUA \n
 https://www.canva.com/link?target=https%3A%2F%2Fwww.kaggle.com%2Fdatasets%2Fborismarjanovic%2Fprice-volume-data-for-all-us-stocks-etfs&design=DAGEvI8B6kI&accessRole=viewer&linkSource=document'''
 st.markdown(f"""
-    <div style="text-align:center {{
-        color: #4b0081;
-        font-size: 18px;
-    }}
-    </style>
-    <div class="centered-text">
+    <div style="text-align:center; color: #4b0081; font-size: 18px;">
         {text_1}
     </div>
     """, unsafe_allow_html=True)
-image_1 = st.image('/root/code/NathaliaMontandon/stocks_vs_behavior/app_data/hsmdataset.jpg')
+
+if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'app_data', 'hsmdataset.jpg')):
+    image_1 = st.image(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'app_data', 'hsmdataset.jpg'))
 
 text_2 = ''' ### DAILY NEWS FOR STOCK MARKET PREDICTION \n
 Notícias mais votadas no Reddit WorldNews Channel diariamente \n
 https://www.canva.com/link?target=https%3A%2F%2Fwww.kaggle.com%2Fdatasets%2Faaron7sun%2Fstocknews%3Fselect%3DCombined_News_DJIA.csv&design=DAGEvI8B6kI&accessRole=viewer&linkSource=document'''
 st.markdown(f"""
-    <div style="text-align:center {{
-        color: #4b0081;
-        font-size: 18px;
-    }}
-    </style>
-    <div class="centered-text">
+    <div style="text-align:center; color: #4b0081; font-size: 18px;">
         {text_2}
     </div>
     """, unsafe_allow_html=True)
-image_2 = st.image('/root/code/NathaliaMontandon/stocks_vs_behavior/app_data/redditnews.jpg')
+
+if os.path.exists(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'app_data', 'redditnews.jpg')):
+    image_2 = st.image(os.path.join(os.path.dirname(os.path.dirname(__file__)), 'app_data', 'redditnews.jpg'))
 
 text_3 = '''TECNOLOGIAS E FERRAMENTAS
 ... que poderão ser utilizadas \n
@@ -67,12 +61,7 @@ Recurrent Neural Networks (RNN) \n
 Transformers'''
 
 st.markdown(f"""
-    <div style="text-align:center {{
-        color: #4b0081;
-        font-size: 18px;
-    }}
-    </style>
-    <div class="centered-text">
+    <div style="text-align:center; color: #4b0081; font-size: 18px;">
         {text_3}
     </div>
     """, unsafe_allow_html=True)

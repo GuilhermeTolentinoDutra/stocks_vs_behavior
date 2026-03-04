@@ -3,13 +3,14 @@ import pickle
 import numpy as np
 import os
 import pandas as pd
+import streamlit as st
 from pandas.tseries.holiday import USFederalHolidayCalendar
 from pandas.tseries.offsets import CustomBusinessDay
 
 path_models = os.path.join(os.path.abspath(""), "models")
 
-
-def predict(data, selected_date):
+@st.cache_resource
+def load_model_and_scalers():
     # Load model
     model = tf.keras.models.load_model(
         os.path.join(
@@ -24,6 +25,12 @@ def predict(data, selected_date):
 
     with open(os.path.join(path_models, "aapl_feature_scaler.pkl"), "rb") as f:
         feature_scaler = pickle.load(f)
+
+    return model, target_scaler, feature_scaler
+
+
+def predict(data, selected_date):
+    model, target_scaler, feature_scaler = load_model_and_scalers()
 
     # selected_date = selected_date + " 23:59:59"
     data_predict = data[data["Date"] <= selected_date]
