@@ -1,12 +1,12 @@
-# Importação de bibliotecas
 import streamlit as st
 import pandas as pd
-import os
 
-from utils.app_functions import predict, compute_predicted_date
-
-path_pages = os.path.join(os.path.abspath(""), "pages")
-path_processed_data = os.path.join(os.path.abspath(""), "data", "processed")
+from utils.app_functions import (
+    compute_predicted_date,
+    get_prediction_mode_message,
+    load_price_data,
+    predict,
+)
 
 st.set_page_config(
     "Stock vs. Behavior - Quanto irá valer?",
@@ -32,27 +32,37 @@ st.markdown(
 
 st.divider()
 
-# Carregamento e tratamento dos dados
-data = pd.read_csv(os.path.join(path_processed_data, "aapl_data.csv"))
+data, data_message = load_price_data()
+data = data[data["Date"] >= pd.to_datetime("2009-08-07").date()].copy()
 
-data = data[data["Date"] >= "2009-08-07"]
+if data_message:
+    st.warning(data_message)
 
-data["Date"] = pd.to_datetime(data["Date"]).dt.date
+prediction_mode_message = get_prediction_mode_message()
+if prediction_mode_message:
+    st.info(prediction_mode_message)
 
-stock_price_df = data[["Date", "AAPL"]]
-stock_price_df.rename({"AAPL": "Close"}, axis=1, inplace=True)
+stock_price_df = data[["Date", "AAPL"]].rename({"AAPL": "Close"}, axis=1)
 stock_price_df = stock_price_df.sort_values("Date").drop_duplicates("Date", keep="last")
 
-min_date = stock_price_df["Date"].min() + pd.DateOffset(days=30)
-max_date = stock_price_df["Date"].max()
+available_dates = stock_price_df["Date"].tolist()
+if len(available_dates) < 2:
+    st.error("The app needs at least two trading days to calculate a forecast.")
+    st.stop()
 
+min_index = min(30, len(available_dates) - 2)
+min_date = available_dates[min_index]
+max_date = available_dates[-2]
+
+default_index = min(max(min_index, len(available_dates) // 2), len(available_dates) - 2)
+default_date = available_dates[default_index]
 min_date_str = min_date.strftime(format="%d/%m/%Y")
 max_date_str = max_date.strftime(format="%d/%m/%Y")
 
 # Input da data cuja previsão será realizada
 selected_date = st.sidebar.date_input(
     f"Selecione a data ({min_date_str} a {max_date_str}):",
-    value=min_date,
+    value=default_date,
     min_value=min_date,
     max_value=max_date,
 )
@@ -73,7 +83,7 @@ with col1:
     st.dataframe(filtered_data, hide_index=True, use_container_width=True, height=250)
 
 with col2:
-    predicted_date = compute_predicted_date(min_date, max_date, selected_date)
+    predicted_date = compute_predicted_date(available_dates, selected_date)
     predicted_date_str = predicted_date.strftime(format="%d de %b de %Y")
 
     st.write(f"## {predicted_date_str}")
