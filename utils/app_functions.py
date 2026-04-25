@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tf_keras as keras
 import pickle
 import numpy as np
 import os
@@ -12,7 +12,7 @@ path_models = os.path.join(os.path.abspath(""), "models")
 @st.cache_resource
 def load_model_and_scalers():
     # Load model
-    model = tf.keras.models.load_model(
+    model = keras.models.load_model(
         os.path.join(
             path_models,
             "aapl_rnn_model.keras",
