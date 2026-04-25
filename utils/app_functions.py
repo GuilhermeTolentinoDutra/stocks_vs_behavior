@@ -1,18 +1,45 @@
-import tensorflow as tf
-import pickle
-import numpy as np
 import os
+import pickle
+import shutil
+import tempfile
+
+os.environ.setdefault("TF_USE_LEGACY_KERAS", "1")
+
+import numpy as np
 import pandas as pd
 import streamlit as st
+import tensorflow as tf
 from pandas.tseries.holiday import USFederalHolidayCalendar
 from pandas.tseries.offsets import CustomBusinessDay
 
 path_models = os.path.join(os.path.abspath(""), "models")
 
+
+def _load_legacy_compatible_model(model_path):
+    try:
+        return tf.keras.models.load_model(model_path)
+    except ValueError as exc:
+        # The checked-in model is stored in HDF5 format but uses a .keras suffix.
+        if not (os.path.exists(model_path) and model_path.endswith(".keras")):
+            raise
+
+        with tempfile.NamedTemporaryFile(suffix=".h5", delete=False) as temp_model_file:
+            temp_model_path = temp_model_file.name
+
+        shutil.copyfile(model_path, temp_model_path)
+
+        try:
+            return tf.keras.models.load_model(temp_model_path)
+        except Exception:
+            raise exc
+        finally:
+            if os.path.exists(temp_model_path):
+                os.remove(temp_model_path)
+
 @st.cache_resource
 def load_model_and_scalers():
     # Load model
-    model = tf.keras.models.load_model(
+    model = _load_legacy_compatible_model(
         os.path.join(
             path_models,
             "aapl_rnn_model.keras",
