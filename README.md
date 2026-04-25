@@ -11,3 +11,17 @@ E no mercado financeiro, seria diferente? Como essa superexposição a diversos 
 Nosso projeto busca demonstrar como as principais notícias podem impactar o preço das ações, considerando que muitos investidores baseiam suas operações nos acontecimentos do momento.
 
 Projeto elaborado por: Evandro Herrera, Guilherme Dutra, Letícia Mesquita e Nathália Montandon
+
+## Como executar localmente
+
+1. Instale as dependências:
+
+```bash
+python3 -m pip install -r requirements.txt
+```
+
+2. Rode a aplicação Streamlit:
+
+```bash
+python3 -m streamlit run app.py
+```

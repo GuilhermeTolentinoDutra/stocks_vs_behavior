@@ -70,8 +70,11 @@ def compute_predicted_date(min_date, max_date, selected_date):
 
     calendar["Date"] = pd.to_datetime(calendar["Date"]).dt.date
 
-    predicted_date = pd.to_datetime(
-        calendar[calendar["Date"] > selected_date].iloc[0]["Date"]
-    ).date()
+    future_dates = calendar[calendar["Date"] > selected_date]
+    if future_dates.empty:
+        # Keep the app stable when user selects the latest available date.
+        return selected_date
+
+    predicted_date = pd.to_datetime(future_dates.iloc[0]["Date"]).date()
 
     return predicted_date
