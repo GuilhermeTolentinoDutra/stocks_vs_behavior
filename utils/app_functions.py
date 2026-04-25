@@ -32,10 +32,8 @@ def load_model_and_scalers():
 def predict(data, selected_date):
     model, target_scaler, feature_scaler = load_model_and_scalers()
 
-    # selected_date = selected_date + " 23:59:59"
-    data_predict = data[data["Date"] <= selected_date]
+    data_predict = data[data["Date"] <= selected_date].copy()
     data_predict["AAPL_target"] = target_scaler.transform(data_predict[["AAPL_target"]])
-
     data_predict["AAPL"] = feature_scaler.transform(data_predict[["AAPL"]])
 
     features = ["AAPL", "negative", "neutral", "positive"]
@@ -48,12 +46,7 @@ def predict(data, selected_date):
     X = np.array(X)
 
     y_pred = model.predict(X)
-
-    print(y_pred)
-
     prediction = target_scaler.inverse_transform(y_pred)
-
-    print(prediction)
 
     return prediction[-1, -1]
 
