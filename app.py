@@ -1,12 +1,13 @@
 # Importação de bibliotecas
 import streamlit as st
 import pandas as pd
-import os
+from pathlib import Path
 
 from utils.app_functions import predict, compute_predicted_date
 
-path_pages = os.path.join(os.path.abspath(""), "pages")
-path_processed_data = os.path.join(os.path.abspath(""), "data", "processed")
+BASE_DIR = Path(__file__).resolve().parent
+path_processed_data = BASE_DIR / "data" / "processed"
+sample_data_path = BASE_DIR / "sample_data" / "aapl_data.csv"
 
 st.set_page_config(
     "Stock vs. Behavior - Quanto irá valer?",
@@ -33,28 +34,44 @@ st.markdown(
 st.divider()
 
 # Carregamento e tratamento dos dados
-data = pd.read_csv(os.path.join(path_processed_data, "aapl_data.csv"))
-
-data = data[data["Date"] >= "2009-08-07"]
+data_path = path_processed_data / "aapl_data.csv"
+if data_path.exists():
+    data = pd.read_csv(data_path)
+else:
+    st.warning(
+        "Arquivo `data/processed/aapl_data.csv` não encontrado. "
+        "Carregando uma amostra empacotada para manter o aplicativo em execução."
+    )
+    data = pd.read_csv(sample_data_path)
 
 data["Date"] = pd.to_datetime(data["Date"]).dt.date
+data = data[data["Date"] >= pd.to_datetime("2009-08-07").date()]
 
 stock_price_df = data[["Date", "AAPL"]]
-stock_price_df.rename({"AAPL": "Close"}, axis=1, inplace=True)
+stock_price_df = stock_price_df.rename({"AAPL": "Close"}, axis=1)
 stock_price_df = stock_price_df.sort_values("Date").drop_duplicates("Date", keep="last")
 
-min_date = stock_price_df["Date"].min() + pd.DateOffset(days=30)
+if stock_price_df.shape[0] < 31:
+    st.error("A base de cotações precisa ter pelo menos 31 datas para gerar a previsão.")
+    st.stop()
+
+min_date = stock_price_df["Date"].iloc[30]
 max_date = stock_price_df["Date"].max()
+max_selectable_date = stock_price_df["Date"].iloc[-2]
+
+if min_date > max_selectable_date:
+    st.error("A base de cotações não possui datas suficientes após a janela inicial.")
+    st.stop()
 
 min_date_str = min_date.strftime(format="%d/%m/%Y")
-max_date_str = max_date.strftime(format="%d/%m/%Y")
+max_date_str = max_selectable_date.strftime(format="%d/%m/%Y")
 
 # Input da data cuja previsão será realizada
 selected_date = st.sidebar.date_input(
     f"Selecione a data ({min_date_str} a {max_date_str}):",
     value=min_date,
     min_value=min_date,
-    max_value=max_date,
+    max_value=max_selectable_date,
 )
 
 selected_date = pd.to_datetime(selected_date).date()
