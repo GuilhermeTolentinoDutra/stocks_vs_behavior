@@ -9,14 +9,24 @@ from pandas.tseries.offsets import CustomBusinessDay
 
 path_models = os.path.join(os.path.abspath(""), "models")
 
+
+class _GRULegacyCompat(tf.keras.layers.GRU):
+    """Older Keras/TF checkpoints may serialize GRU with `time_major`; strip it for Keras 3."""
+
+    @classmethod
+    def from_config(cls, config):
+        cfg = dict(config)
+        cfg.pop("time_major", None)
+        return super().from_config(cfg)
+
+
 @st.cache_resource
 def load_model_and_scalers():
-    # Load model
+    # Load model (HDF5 checkpoint saved as .h5; legacy name was .keras but was not zip format)
     model = tf.keras.models.load_model(
-        os.path.join(
-            path_models,
-            "aapl_rnn_model.keras",
-        )
+        os.path.join(path_models, "aapl_rnn_model.h5"),
+        custom_objects={"GRU": _GRULegacyCompat},
+        compile=False,
     )
 
     # Load scaler applied to target column
