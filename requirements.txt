@@ -3,5 +3,3 @@ pandas
 scikit-learn
 fastapi
 streamlit
-keras
-tensorflow
