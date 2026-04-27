@@ -1,6 +1,6 @@
 data/
 notebooks/tests/
 *.Identifier
-models/
+# models/
 __pycache__/
 *.log
