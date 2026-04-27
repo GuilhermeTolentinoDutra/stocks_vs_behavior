@@ -44,3 +44,12 @@ do modelo treinado, gere ou copie os artefatos acima para os caminhos esperados 
 Se qualquer arquivo em `models/` estiver ausente, incompleto ou incompatível com a versão
 instalada do Keras/TensorFlow, o app continua em modo demonstração em vez de interromper a
 execução.
+
+Se você não tiver os artefatos reais do modelo, remova qualquer pasta `models/` local
+incompleta para evitar confusão:
+
+```bash
+rm -rf models
+```
+
+O app continuará funcionando com os dados de exemplo e exibirá `Cotação de Referência`.

@@ -1,3 +1,4 @@
+import logging
 import pickle
 import numpy as np
 import os
@@ -20,9 +21,17 @@ def get_model_artifact_paths():
 
 def _missing_model_message():
     return (
-        "Modo demonstração: os arquivos do modelo treinado não foram encontrados em "
-        "`models/`. A cotação exibida é uma referência baseada na última cotação "
-        "disponível, não uma previsão do modelo."
+        "Modo demonstração: o modelo treinado não está disponível. "
+        "A cotação exibida é uma referência baseada na última cotação disponível, "
+        "não uma previsão do modelo."
+    )
+
+
+def _unavailable_model_message():
+    return (
+        "Modo demonstração: o modelo treinado não pôde ser carregado. "
+        "A cotação exibida é uma referência baseada na última cotação disponível, "
+        "não uma previsão do modelo."
     )
 
 
@@ -43,9 +52,7 @@ def load_model_and_scalers():
             None,
             None,
             None,
-            "Modo demonstração: os arquivos do modelo foram encontrados, mas o "
-            "TensorFlow não está instalado. Instale `tensorflow` para habilitar a "
-            "previsão do modelo.",
+            _unavailable_model_message(),
         )
 
     try:
@@ -59,13 +66,16 @@ def load_model_and_scalers():
         with open(feature_scaler_path, "rb") as f:
             feature_scaler = pickle.load(f)
     except Exception as exc:
+        logging.warning(
+            "Não foi possível carregar o modelo treinado: %s: %s",
+            type(exc).__name__,
+            exc,
+        )
         return (
             None,
             None,
             None,
-            "Modo demonstração: os arquivos em `models/` existem, mas não puderam "
-            f"ser carregados ({type(exc).__name__}: {exc}). Confira se o arquivo "
-            "`.keras` e os scalers `.pkl` foram copiados corretamente.",
+            _unavailable_model_message(),
         )
 
     return model, target_scaler, feature_scaler, None
