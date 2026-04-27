@@ -3,7 +3,11 @@ import streamlit as st
 import pandas as pd
 from pathlib import Path
 
-from utils.app_functions import predict, compute_predicted_date
+from utils.app_functions import (
+    compute_predicted_date,
+    get_model_status_message,
+    predict,
+)
 
 BASE_DIR = Path(__file__).resolve().parent
 path_processed_data = BASE_DIR / "data" / "processed"
@@ -94,6 +98,11 @@ with col2:
     predicted_date_str = predicted_date.strftime(format="%d de %b de %Y")
 
     st.write(f"## {predicted_date_str}")
+    model_status_message = get_model_status_message()
+    prediction_label = "Cotação Prevista"
+    if model_status_message:
+        prediction_label = "Cotação de Referência"
+        st.info(model_status_message)
 
     last_price = float(filtered_data.iloc[0]["Close"])
 
@@ -103,7 +112,7 @@ with col2:
         predicted_delta = ((predicted_price - last_price) / last_price) * 100
 
         st.metric(
-            label="Cotação Prevista",
+            label=prediction_label,
             value=f"US$ {predicted_price:.2f}",
             delta=f"{predicted_delta:.4f}%",
         )

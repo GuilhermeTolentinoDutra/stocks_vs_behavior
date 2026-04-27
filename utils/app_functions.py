@@ -9,45 +9,78 @@ from pandas.tseries.offsets import CustomBusinessDay
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 path_models = os.path.join(PROJECT_ROOT, "models")
 
+
+def get_model_artifact_paths():
+    return (
+        os.path.join(path_models, "aapl_rnn_model.keras"),
+        os.path.join(path_models, "aapl_target_scaler.pkl"),
+        os.path.join(path_models, "aapl_feature_scaler.pkl"),
+    )
+
+
+def _missing_model_message():
+    return (
+        "Modo demonstração: os arquivos do modelo treinado não foram encontrados em "
+        "`models/`. A cotação exibida é uma referência baseada na última cotação "
+        "disponível, não uma previsão do modelo."
+    )
+
+
 @st.cache_resource
 def load_model_and_scalers():
-    model_path = os.path.join(path_models, "aapl_rnn_model.keras")
-    target_scaler_path = os.path.join(path_models, "aapl_target_scaler.pkl")
-    feature_scaler_path = os.path.join(path_models, "aapl_feature_scaler.pkl")
+    model_path, target_scaler_path, feature_scaler_path = get_model_artifact_paths()
 
     if not all(
-        os.path.exists(path)
+        os.path.isfile(path) and os.path.getsize(path) > 0
         for path in (model_path, target_scaler_path, feature_scaler_path)
     ):
-        return None, None, None
+        return None, None, None, _missing_model_message()
 
     try:
         import tensorflow as tf
     except ModuleNotFoundError:
-        return None, None, None
+        return (
+            None,
+            None,
+            None,
+            "Modo demonstração: os arquivos do modelo foram encontrados, mas o "
+            "TensorFlow não está instalado. Instale `tensorflow` para habilitar a "
+            "previsão do modelo.",
+        )
 
-    model = tf.keras.models.load_model(
-        model_path,
-    )
+    try:
+        model = tf.keras.models.load_model(
+            model_path,
+        )
 
-    with open(target_scaler_path, "rb") as f:
-        target_scaler = pickle.load(f)
+        with open(target_scaler_path, "rb") as f:
+            target_scaler = pickle.load(f)
 
-    with open(feature_scaler_path, "rb") as f:
-        feature_scaler = pickle.load(f)
+        with open(feature_scaler_path, "rb") as f:
+            feature_scaler = pickle.load(f)
+    except Exception as exc:
+        return (
+            None,
+            None,
+            None,
+            "Modo demonstração: os arquivos em `models/` existem, mas não puderam "
+            f"ser carregados ({type(exc).__name__}: {exc}). Confira se o arquivo "
+            "`.keras` e os scalers `.pkl` foram copiados corretamente.",
+        )
 
-    return model, target_scaler, feature_scaler
+    return model, target_scaler, feature_scaler, None
+
+
+def get_model_status_message():
+    _, _, _, status_message = load_model_and_scalers()
+    return status_message
 
 
 def predict(data, selected_date):
-    model, target_scaler, feature_scaler = load_model_and_scalers()
+    model, target_scaler, feature_scaler, _ = load_model_and_scalers()
     data_predict = data[data["Date"] <= selected_date].copy()
 
     if model is None:
-        st.warning(
-            "Modelo treinado não encontrado em `models/`. "
-            "Exibindo previsão de referência com a última cotação disponível."
-        )
         return float(data_predict.iloc[-1]["AAPL"])
 
     data_predict["AAPL_target"] = target_scaler.transform(data_predict[["AAPL_target"]])
