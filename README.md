@@ -21,6 +21,14 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+Depois de iniciar, acesse:
+
+- Localmente: `http://localhost:10000`
+- Alternativa local: `http://127.0.0.1:10000`
+
+Se o terminal mostrar `http://0.0.0.0:10000`, não use esse endereço no navegador.
+`0.0.0.0` indica apenas que o servidor está escutando em todas as interfaces.
+
 O aplicativo procura primeiro pelos artefatos completos gerados pelos notebooks:
 
 - `data/processed/aapl_data.csv`
@@ -29,5 +37,10 @@ O aplicativo procura primeiro pelos artefatos completos gerados pelos notebooks:
 - `models/aapl_feature_scaler.pkl`
 
 Como esses diretórios são ignorados pelo Git, uma instalação limpa usa `sample_data/aapl_data.csv`
-e exibe uma previsão de referência baseada na última cotação disponível. Para usar o modelo
-treinado, gere ou copie os artefatos acima para os caminhos esperados.
+e exibe uma cotação de referência baseada na última cotação disponível. Para usar a previsão
+do modelo treinado, gere ou copie os artefatos acima para os caminhos esperados e instale
+`tensorflow` no ambiente.
+
+Se qualquer arquivo em `models/` estiver ausente, incompleto ou incompatível com a versão
+instalada do Keras/TensorFlow, o app continua em modo demonstração em vez de interromper a
+execução.
