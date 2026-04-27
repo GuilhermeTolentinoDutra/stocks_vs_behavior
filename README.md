@@ -21,6 +21,14 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+Depois de iniciar, acesse:
+
+- Localmente: `http://localhost:10000`
+- Alternativa local: `http://127.0.0.1:10000`
+
+Se o terminal mostrar `http://0.0.0.0:10000`, não use esse endereço no navegador.
+`0.0.0.0` indica apenas que o servidor está escutando em todas as interfaces.
+
 O aplicativo procura primeiro pelos artefatos completos gerados pelos notebooks:
 
 - `data/processed/aapl_data.csv`
